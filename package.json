@@ -9,7 +9,11 @@
     "lint": "tsc",
     "preview": "vite preview",
     "server": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "heroku-postbuild": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "cors": "^2.8.6",

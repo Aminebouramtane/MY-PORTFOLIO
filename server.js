@@ -10,10 +10,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const distPath = path.join(__dirname, 'dist');
 
 app.use(cors());
 app.use(express.json({ limit: '20mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 
 // Storage for uploaded files
 const storage = multer.diskStorage({
@@ -658,6 +663,15 @@ app.post('/api/admin/import', authMiddleware, (req, res) => {
   saveData(importedData);
   res.json({ success: true, message: 'Portfolio backup imported successfully!' });
 });
+
+if (fs.existsSync(distPath)) {
+  app.get(/^(?!\/api(?:\/|$)|\/uploads(?:\/|$)).*/, (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Portfolio API Server running on port ${PORT}`);
