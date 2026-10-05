@@ -55,19 +55,7 @@ export const Header: React.FC<HeaderProps> = ({
             color: 'var(--color-bone)'
           }}
         >
-          <span
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '1.25rem',
-              fontWeight: 900,
-              letterSpacing: '-0.04em',
-              background: 'linear-gradient(135deg, var(--color-bone) 30%, var(--color-saffron))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            AMINE BOURAMTANE
-          </span>
+          <img src="/logo.png" alt="Amine Bouramtane Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
         </a>
 
         {/* Desktop Nav Links */}

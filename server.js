@@ -4,6 +4,14 @@ import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+import dotenv from 'dotenv';
+import Groq from 'groq-sdk';
+
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +27,51 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 }
+
+// Chatbot initialization
+let pdfContext = "";
+const pdfPath = path.join(__dirname, 'chatbot_knowledge.pdf');
+
+if (fs.existsSync(pdfPath)) {
+  const dataBuffer = fs.readFileSync(pdfPath);
+  pdfParse(dataBuffer).then(function(data) {
+    pdfContext = data.text;
+    console.log("Chatbot knowledge loaded from PDF successfully.");
+  }).catch(err => console.error("Error reading PDF:", err));
+} else {
+  console.log("chatbot_knowledge.pdf not found in root directory. Chatbot will run without PDF context.");
+}
+
+// Chat API Endpoint
+app.post('/api/chat', async (req, res) => {
+  const { message } = req.body;
+  
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: "Groq API Key is not configured in .env file." });
+  }
+
+  try {
+    const apiKey = process.env.GROQ_API_KEY || (() => { dotenv.config({ override: true }); return process.env.GROQ_API_KEY; })();
+    const groq = new Groq({ apiKey });
+    const systemPrompt = `You are Amine Bouramtane. You are a Junior Data Analyst & AI Engineer based in Marrakech, Morocco. 
+Respond to queries in the first person (I, me, my) as if you are Amine himself talking to a recruiter, client, or visitor on your portfolio.
+Keep your answers concise, professional, and friendly. Do not use overly complex formatting.
+Here is your background knowledge extracted from your resume/PDF:\n\n${pdfContext}`;
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: message || "Hello" }
+      ],
+      model: "qwen/qwen3.8-27b",
+    });
+
+    res.json({ reply: chatCompletion.choices[0]?.message?.content || "I'm having trouble thinking right now." });
+  } catch (error) {
+    console.error("Chat error:", error);
+    res.status(500).json({ error: "Failed to generate chat response." });
+  }
+});
 
 // Storage for uploaded files
 const storage = multer.diskStorage({

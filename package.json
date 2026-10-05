@@ -17,9 +17,12 @@
   },
   "dependencies": {
     "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "groq-sdk": "^1.6.0",
     "lucide-react": "^1.51.0",
     "multer": "^2.4.0",
+    "pdf-parse": "^1.1.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"

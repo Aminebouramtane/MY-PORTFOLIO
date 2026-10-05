@@ -6,6 +6,7 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { AdminLogin } from './pages/AdminLogin';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { Chatbot } from './components/Chatbot';
 
 export const App: React.FC = () => {
   // Theme state
@@ -88,6 +89,7 @@ export const App: React.FC = () => {
           }
         />
       </Routes>
+      <Chatbot />
     </BrowserRouter>
   );
 };
