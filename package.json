@@ -20,6 +20,7 @@
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "groq-sdk": "^1.6.0",
+    "lenis": "^1.3.27",
     "lucide-react": "^1.51.0",
     "multer": "^2.4.0",
     "pdf-parse": "^1.1.1",
@@ -37,6 +38,9 @@
     "@vitejs/plugin-react": "^6.1.1",
     "concurrently": "^10.0.5",
     "typescript": "^7.0.2",
-    "vite": "^8.3.2"
-  }
+    "vite": "^8.3.2",
+    "vitest": "^2.0.0",
+    "@testing-library/react": "^15.0.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "jsdom": "^24.0.0"  }
 }

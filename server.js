@@ -28,6 +28,20 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 }
 
+// Serve public assets (logo.png, cv.pdf, images, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Admin dashboard — serve admin.html at /admin and /admin/*
+const adminHtmlPath = path.join(__dirname, 'admin.html');
+app.get(/^\/admin(\/.*)?$/, (req, res) => {
+  if (fs.existsSync(adminHtmlPath)) {
+    res.sendFile(adminHtmlPath);
+  } else {
+    res.status(404).send('Admin panel not found.');
+  }
+});
+
+
 // Chatbot initialization
 let pdfContext = "";
 const pdfPath = path.join(__dirname, 'chatbot_knowledge.pdf');
@@ -410,7 +424,8 @@ app.get('/api/site', (req, res) => {
     settings: db.settings,
     projects: publicProjects,
     skills: db.skills.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
-    timeline: db.timeline.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    timeline: db.timeline.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
+    certificates: (db.certificates || []).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
   });
 });
 
@@ -637,6 +652,40 @@ app.get('/api/admin/settings', authMiddleware, (req, res) => {
   const db = getData();
   res.json(db.settings);
 });
+
+// GET/POST/PUT/DELETE /api/admin/certificates
+app.get('/api/admin/certificates', authMiddleware, (req, res) => {
+  const db = getData();
+  res.json(db.certificates || []);
+});
+
+app.post('/api/admin/certificates', authMiddleware, (req, res) => {
+  const db = getData();
+  if (!db.certificates) db.certificates = [];
+  const cert = { ...req.body, id: 'c' + Date.now() };
+  db.certificates.push(cert);
+  saveData(db);
+  res.json(cert);
+});
+
+app.put('/api/admin/certificates/:id', authMiddleware, (req, res) => {
+  const db = getData();
+  if (!db.certificates) db.certificates = [];
+  const idx = db.certificates.findIndex(c => c.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  db.certificates[idx] = { ...db.certificates[idx], ...req.body };
+  saveData(db);
+  res.json(db.certificates[idx]);
+});
+
+app.delete('/api/admin/certificates/:id', authMiddleware, (req, res) => {
+  const db = getData();
+  if (!db.certificates) return res.json({ success: true });
+  db.certificates = db.certificates.filter(c => c.id !== req.params.id);
+  saveData(db);
+  res.json({ success: true });
+});
+
 
 app.put('/api/admin/settings', authMiddleware, (req, res) => {
   const db = getData();

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard — Amine Bouramtane</title>
+<meta name="robots" content="noindex,nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{background:#f5f5f3;color:#111;font-family:'Onest',sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font:inherit;color:inherit}
+ul{list-style:none}
+/* LAYOUT */
+.admin-layout{display:grid;grid-template-columns:16rem 1fr;min-height:100vh}
+@media(max-width:900px){.admin-layout{grid-template-columns:1fr}}
+/* SIDEBAR */
+.sidebar{background:#0a0a0a;color:#fff;display:flex;flex-direction:column;padding:1.5rem 1.25rem;gap:2rem;position:sticky;top:0;height:100vh;overflow-y:auto}
+@media(max-width:900px){.sidebar{display:none}}
+.sidebar-brand{display:flex;align-items:center;gap:.625rem;font-weight:600;font-size:1rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-logo{width:1.75rem;height:1.75rem;object-fit:contain;filter:brightness(10)}
+.sidebar-nav{display:flex;flex-direction:column;gap:.25rem;flex:1}
+.nav-section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin:1rem 0 .5rem .5rem}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.625rem .75rem;border-radius:.75rem;font-size:.875rem;font-weight:500;color:rgba(255,255,255,.6);transition:background .2s,color .2s;cursor:pointer;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff}
+.nav-item svg{width:1rem;height:1rem;flex-shrink:0}
+.sidebar-footer{border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;display:flex;flex-direction:column;gap:.5rem}
+.sidebar-footer-btn{display:flex;align-items:center;gap:.625rem;font-size:.75rem;color:rgba(255,255,255,.5);padding:.5rem .75rem;border-radius:.625rem;transition:color .2s}
+.sidebar-footer-btn:hover{color:#fff}
+.sidebar-footer-btn svg{width:.875rem;height:.875rem}
+/* TOPBAR (mobile) */
+.topbar{display:none;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:#0a0a0a;color:#fff;position:sticky;top:0;z-index:50}
+@media(max-width:900px){.topbar{display:flex}}
+.topbar-brand{display:flex;align-items:center;gap:.625rem;font-weight:600}
+.topbar-logo{width:1.5rem;height:1.5rem;object-fit:contain;filter:brightness(10)}
+/* MAIN */
+.admin-main{display:flex;flex-direction:column;min-height:100vh;overflow:hidden}
+.admin-content{flex:1;padding:2rem 1.5rem}
+@media(min-width:640px){.admin-content{padding:2.5rem 2rem}}
+/* PAGE HEADER */
+.page-header{margin-bottom:2rem}
+.page-title{font-size:1.5rem;font-weight:600;letter-spacing:-.02em}
+.page-subtitle{font-size:.875rem;color:rgba(17,17,17,.55);margin-top:.25rem}
+/* TABS */
+.tabs{display:flex;gap:.25rem;border-bottom:1px solid #e6e5e2;margin-bottom:2rem;overflow-x:auto}
+.tab-btn{padding:.625rem 1rem;font-size:.875rem;font-weight:500;color:rgba(17,17,17,.5);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .2s,border-color .2s}
+.tab-btn.active{color:#111;border-bottom-color:#111}
+.tab-btn:hover{color:#111}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+/* STATS CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2rem}
+@media(min-width:640px){.stats-row{grid-template-columns:repeat(4,1fr)}}
+.stat-card{background:#fff;border-radius:1.25rem;padding:1.25rem 1.5rem;outline:1px solid #e6e5e2}
+.stat-card-value{font-size:2rem;font-weight:600;letter-spacing:-.02em}
+.stat-card-label{font-size:.75rem;color:rgba(17,17,17,.5);margin-top:.25rem;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+/* CARD */
+.card{background:#fff;border-radius:1.25rem;outline:1px solid #e6e5e2;overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid #f1f0ee}
+.card-title{font-size:1rem;font-weight:600}
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead tr{border-bottom:1px solid #f1f0ee}
+th{text-align:left;padding:.75rem 1rem;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(17,17,17,.45)}
+tbody tr{border-bottom:1px solid #f9f9f8;transition:background .15s}
+tbody tr:hover{background:#fafaf9}
+tbody tr:last-child{border-bottom:none}
+td{padding:.875rem 1rem;vertical-align:middle}
+.badge{display:inline-flex;align-items:center;border-radius:9999px;padding:.25rem .75rem;font-size:.75rem;font-weight:500}
+.badge.green{background:#dcfce7;color:#166534}
+.badge.amber{background:#fef3c7;color:#92400e}
+.badge.gray{background:#f1f0ee;color:#555}
+.badge.blue{background:#dbeafe;color:#1e40af}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.875rem;padding:.625rem 1.25rem;font-size:.875rem;font-weight:500;transition:background .2s,transform .2s;cursor:pointer;border:none;font-family:inherit}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:#0a0a0a;color:#fff}
+.btn.primary:hover{background:#222}
+.btn.danger{background:#fee2e2;color:#991b1b}
+.btn.danger:hover{background:#fecaca}
+.btn.ghost{background:transparent;color:rgba(17,17,17,.6);border:1px solid #e6e5e2}
+.btn.ghost:hover{background:#f5f5f3;color:#111}
+.btn.sm{padding:.375rem .875rem;font-size:.8125rem}
+.btn svg{width:.875rem;height:.875rem}
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:640px){.form-grid.cols2{grid-template-columns:1fr 1fr}}
+.form-group{display:flex;flex-direction:column;gap:.375rem}
+.form-label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:rgba(17,17,17,.5)}
+.form-input{border:1px solid #e6e5e2;border-radius:.75rem;padding:.75rem 1rem;font-size:.875rem;outline:none;background:#fff;transition:border-color .2s}
+.form-input:focus{border-color:rgba(17,17,17,.3)}
+.form-input::placeholder{color:rgba(17,17,17,.3)}
+textarea.form-input{resize:vertical;min-height:6rem}
+.form-footer{display:flex;justify-content:flex-end;gap:.75rem;padding-top:.5rem}
+/* MODAL OVERLAY */
+.overlay{position:fixed;inset:0;z-index:200;background:rgba(17,17,17,.25);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.overlay-panel{background:#fff;border-radius:1.5rem;padding:2rem;width:100%;max-width:38rem;max-height:90vh;overflow-y:auto;outline:1px solid #e6e5e2;box-shadow:0 20px 60px -15px rgba(0,0,0,.2)}
+.overlay-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.overlay-title{font-size:1.125rem;font-weight:600}
+.overlay-close{width:2rem;height:2rem;display:grid;place-items:center;border-radius:9999px;background:#f1f0ee;color:rgba(17,17,17,.6)}
+.overlay-close:hover{background:#e3e2df}
+.overlay-close svg{width:.875rem;height:.875rem}
+/* MESSAGES */
+.msg-item{display:flex;gap:1rem;padding:1rem;border-bottom:1px solid #f1f0ee;transition:background .15s;cursor:pointer}
+.msg-item:hover{background:#fafaf9}
+.msg-item.unread{background:#fffbf7}
+.msg-avatar{width:2.5rem;height:2.5rem;border-radius:9999px;background:#0a0a0a;color:#cf8047;display:grid;place-items:center;font-weight:600;font-size:.875rem;flex-shrink:0}
+.msg-body{flex:1;min-width:0}
+.msg-name{font-weight:600;font-size:.875rem;display:flex;align-items:center;gap:.5rem}
+.msg-unread-dot{width:.5rem;height:.5rem;border-radius:9999px;background:#cf8047;flex-shrink:0}
+.msg-email{font-size:.75rem;color:rgba(17,17,17,.5);margin-top:.125rem}
+.msg-preview{font-size:.8125rem;color:rgba(17,17,17,.6);margin-top:.375rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.msg-date{font-size:.7rem;color:rgba(17,17,17,.35);white-space:nowrap;flex-shrink:0;margin-top:.25rem}
+/* TOAST */
+.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:300;display:flex;flex-direction:column;gap:.5rem}
+.toast{display:flex;align-items:center;gap:.75rem;background:#0a0a0a;color:#fff;border-radius:1rem;padding:.875rem 1.25rem;font-size:.875rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:slideIn .3s cubic-bezier(.2,.8,.2,1)}
+.toast.success{background:#166534;color:#dcfce7}
+.toast.error{background:#991b1b;color:#fee2e2}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:4rem 2rem;color:rgba(17,17,17,.4)}
+.empty-icon{width:3rem;height:3rem;margin:0 auto 1rem;opacity:.4}
+.empty-state p{font-size:.875rem}
+/* LOGIN */
+.login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:#f5f5f3}
+.login-card{background:#fff;border-radius:1.5rem;padding:2rem;width:100%;max-width:24rem;outline:1px solid #e6e5e2}
+.login-brand{display:flex;align-items:center;gap:.625rem;font-weight:600;margin-bottom:2rem;justify-content:center}
+.login-logo{width:2rem;height:2rem;object-fit:contain}
+.login-title{font-size:1.25rem;font-weight:600;margin-bottom:.5rem}
+.login-sub{font-size:.875rem;color:rgba(17,17,17,.5);margin-bottom:1.5rem}
+.login-error{background:#fee2e2;color:#991b1b;border-radius:.75rem;padding:.75rem 1rem;font-size:.875rem;margin-bottom:1rem;display:none}
+/* CHART */
+.chart-wrap{padding:1.25rem 1.5rem}
+.chart-bars{display:flex;align-items:flex-end;gap:2px;height:6rem}
+.chart-bar{flex:1;border-radius:3px 3px 0 0;background:#cf8047;opacity:.8;min-width:4px;transition:opacity .2s}
+.chart-bar:hover{opacity:1}
+/* SWITCH */
+.switch{position:relative;display:inline-block;width:2.5rem;height:1.375rem}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#e6e5e2;border-radius:9999px;transition:.3s}
+.slider:before{position:absolute;content:'';height:1rem;width:1rem;left:.1875rem;bottom:.1875rem;background:#fff;border-radius:9999px;transition:.3s}
+input:checked+.slider{background:#0a0a0a}
+input:checked+.slider:before{transform:translateX(1.125rem)}
+/* TECH TAGS */
+.tech-tags{display:flex;flex-wrap:wrap;gap:.375rem}
+.tech-tag-input{display:flex;align-items:center;gap:.375rem;border:1px solid #e6e5e2;border-radius:9999px;padding:.25rem .75rem;font-size:.8125rem;background:#f9f9f8}
+.tech-tag-input button{color:rgba(17,17,17,.4);line-height:1;font-size:1rem}
+.tech-tag-input button:hover{color:#111}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page" style="display:none">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="/logo.png" alt="" class="login-logo">
+      <span>Amine Bouramtane</span>
+    </div>
+    <h1 class="login-title">Admin Login</h1>
+    <p class="login-sub">Enter your password to manage your portfolio.</p>
+    <div class="login-error" id="loginError">Incorrect password. Please try again.</div>
+    <form id="loginForm" class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="Enter password" required autofocus>
+      </div>
+      <button class="btn primary" type="submit" style="width:100%;justify-content:center">Sign In</button>
+    </form>
+    <div style="margin-top:1.5rem;text-align:center">
+      <a href="/" style="font-size:.875rem;color:rgba(17,17,17,.5)">&#8592; Back to portfolio</a>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardPage" class="admin-layout" style="display:none">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="/logo.png" alt="" class="sidebar-logo">
+      <span>Portfolio Admin</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" data-tab="overview" onclick="switchTab('overview',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-tab="messages" onclick="switchTab('messages',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Messages <span id="unreadBadge" style="margin-left:auto;display:none;background:#cf8047;color:#fff;border-radius:9999px;padding:.1rem .5rem;font-size:.65rem"></span>
+      </button>
+      <div class="nav-section-label">Content</div>
+      <button class="nav-item" data-tab="projects" onclick="switchTab('projects',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Projects
+      </button>
+      <button class="nav-item" data-tab="skills" onclick="switchTab('skills',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Skills
+      </button>
+      <button class="nav-item" data-tab="timeline" onclick="switchTab('timeline',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Timeline
+      </button>
+      <button class="nav-item" data-tab="certificates" onclick="switchTab('certificates',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Certificates
+      </button>
+      <div class="nav-section-label">Settings</div>
+      <button class="nav-item" data-tab="settings" onclick="switchTab('settings',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        Settings
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" class="sidebar-footer-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        View Portfolio
+      </a>
+      <button class="sidebar-footer-btn" onclick="handleLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="admin-main">
+    <!-- Mobile topbar -->
+    <div class="topbar">
+      <div class="topbar-brand">
+        <img src="/logo.png" alt="" class="topbar-logo">
+        <span style="font-weight:600">Admin</span>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <a href="/" class="btn ghost sm">Portfolio</a>
+        <button class="btn ghost sm" onclick="handleLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="admin-content">
+      <!-- OVERVIEW -->
+      <div id="tab-overview" class="tab-panel active">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Welcome back, Amine.</p>
+        </div>
+        <div class="stats-row" id="overviewStats"></div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Page Views (Last 30 Days)</span>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-bars" id="viewsChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div id="tab-messages" class="tab-panel">
+        <div class="page-header">
+          <h1 class="page-title">Messages</h1>
+          <p class="page-subtitle">Contact form submissions from visitors.</p>
+        </div>
+        <div class="card">
+          <div id="messagesList"></div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div id="tab-projects" class="tab-panel">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+          <div>
+            <h1 class="page-title">Projects</h1>
+            <p class="page-subtitle">Manage your portfolio projects.</p>
+          </div>
+          <button class="btn primary" onclick="openProjectForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Project
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Title</th><th>Category</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="projectsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div id="tab-skills" class="tab-panel">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+          <div>
+            <h1 class="page-title">Skills</h1>
+            <p class="page-subtitle">Manage your skill tags and groups.</p>
+          </div>
+          <button class="btn primary" onclick="openSkillForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Skill
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Group</th><th>Order</th><th>Actions</th></tr></thead>
+              <tbody id="skillsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div id="tab-timeline" class="tab-panel">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+          <div>
+            <h1 class="page-title">Timeline</h1>
+            <p class="page-subtitle">Work experience and education entries.</p>
+          </div>
+          <button class="btn primary" onclick="openTimelineForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Entry
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Role</th><th>Organization</th><th>Type</th><th>Period</th><th>Actions</th></tr></thead>
+              <tbody id="timelineTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CERTIFICATES -->
+      <div id="tab-certificates" class="tab-panel">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+          <div>
+            <h1 class="page-title">Certificates</h1>
+            <p class="page-subtitle">Manage your credentials and courses.</p>
+          </div>
+          <button class="btn primary" onclick="openCertForm()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Certificate
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Issuer</th><th>Year</th><th>Actions</th></tr></thead>
+              <tbody id="certsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="tab-settings" class="tab-panel">
+        <div class="page-header">
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Update your personal info and profile.</p>
+        </div>
+        <div class="card" style="padding:1.5rem">
+          <form id="settingsForm" class="form-grid cols2">
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" type="text" name="name" placeholder="Amine Bouramtane">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Job Title (EN)</label>
+              <input class="form-input" type="text" name="title" placeholder="Junior Data Analyst & AI Engineer">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input class="form-input" type="text" name="location" placeholder="Marrakech, Morocco">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" name="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" type="text" name="phone">
+            </div>
+            <div class="form-group">
+              <label class="form-label">GitHub URL</label>
+              <input class="form-input" type="url" name="github">
+            </div>
+            <div class="form-group">
+              <label class="form-label">LinkedIn URL</label>
+              <input class="form-input" type="url" name="linkedin">
+            </div>
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">Bio (EN)</label>
+              <textarea class="form-input" name="bio" rows="3"></textarea>
+            </div>
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">About (EN)</label>
+              <textarea class="form-input" name="about" rows="3"></textarea>
+            </div>
+            <div class="form-group" style="grid-column:span 2">
+              <label class="form-label">Headline (EN)</label>
+              <textarea class="form-input" name="headline" rows="2"></textarea>
+            </div>
+            <div class="form-footer" style="grid-column:span 2">
+              <button type="submit" class="btn primary">Save Settings</button>
+            </div>
+          </form>
+          <hr style="border:none;border-top:1px solid #e6e5e2;margin:2rem 0">
+          <h2 style="font-size:1rem;font-weight:600;margin-bottom:1rem">Change Password</h2>
+          <form id="passwordForm" class="form-grid" style="max-width:24rem">
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input class="form-input" type="password" name="password" placeholder="New password" required>
+            </div>
+            <div class="form-footer">
+              <button type="submit" class="btn primary">Update Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAYS -->
+<!-- Project Form -->
+<div class="overlay" id="projectOverlay">
+  <div class="overlay-panel">
+    <div class="overlay-header">
+      <h2 class="overlay-title" id="projectOverlayTitle">Add Project</h2>
+      <button class="overlay-close" onclick="closeOverlay('projectOverlay')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg></button>
+    </div>
+    <form id="projectForm" class="form-grid cols2">
+      <input type="hidden" name="_id">
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Title</label>
+        <input class="form-input" type="text" name="title" required placeholder="Project title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input" type="text" name="category" placeholder="e.g. Computer Vision">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input class="form-input" type="number" name="year" placeholder="2025">
+      </div>
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Tagline</label>
+        <input class="form-input" type="text" name="tagline" placeholder="Short description">
+      </div>
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Description</label>
+        <textarea class="form-input" name="description" rows="3" placeholder="Full project description"></textarea>
+      </div>
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Technologies (comma-separated)</label>
+        <input class="form-input" type="text" name="tech_str" placeholder="Python, PyTorch, OpenCV">
+      </div>
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Image URL</label>
+        <input class="form-input" type="url" name="image" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">GitHub URL</label>
+        <input class="form-input" type="url" name="repo" placeholder="https://github.com/...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Live URL</label>
+        <input class="form-input" type="url" name="link" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sort Order</label>
+        <input class="form-input" type="number" name="sort_order" placeholder="1">
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.75rem;padding-top:1.5rem">
+        <label class="switch"><input type="checkbox" name="published"><span class="slider"></span></label>
+        <span class="form-label" style="margin:0">Published</span>
+      </div>
+      <div class="form-footer" style="grid-column:span 2">
+        <button type="button" class="btn ghost" onclick="closeOverlay('projectOverlay')">Cancel</button>
+        <button type="submit" class="btn primary">Save Project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Skill Form -->
+<div class="overlay" id="skillOverlay">
+  <div class="overlay-panel" style="max-width:28rem">
+    <div class="overlay-header">
+      <h2 class="overlay-title" id="skillOverlayTitle">Add Skill</h2>
+      <button class="overlay-close" onclick="closeOverlay('skillOverlay')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg></button>
+    </div>
+    <form id="skillForm" class="form-grid">
+      <input type="hidden" name="_id">
+      <div class="form-group">
+        <label class="form-label">Skill Name</label>
+        <input class="form-input" type="text" name="name" required placeholder="e.g. Python">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Group</label>
+        <input class="form-input" type="text" name="grp" required placeholder="e.g. AI & ML">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sort Order</label>
+        <input class="form-input" type="number" name="sort_order" placeholder="1">
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn ghost" onclick="closeOverlay('skillOverlay')">Cancel</button>
+        <button type="submit" class="btn primary">Save Skill</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Timeline Form -->
+<div class="overlay" id="timelineOverlay">
+  <div class="overlay-panel">
+    <div class="overlay-header">
+      <h2 class="overlay-title" id="timelineOverlayTitle">Add Entry</h2>
+      <button class="overlay-close" onclick="closeOverlay('timelineOverlay')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg></button>
+    </div>
+    <form id="timelineForm" class="form-grid cols2">
+      <input type="hidden" name="_id">
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Role / Degree</label>
+        <input class="form-input" type="text" name="role" required placeholder="Data Analyst">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organization</label>
+        <input class="form-input" type="text" name="org" placeholder="Company / University">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input class="form-input" type="text" name="place" placeholder="City, Country">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Period</label>
+        <input class="form-input" type="text" name="period" placeholder="2024 or Jan 2023 – Mar 2024">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-input" name="kind">
+          <option value="work">Work Experience</option>
+          <option value="education">Education</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:span 2">
+        <label class="form-label">Details</label>
+        <textarea class="form-input" name="details" rows="4" placeholder="Responsibilities and achievements..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sort Order</label>
+        <input class="form-input" type="number" name="sort_order" placeholder="1">
+      </div>
+      <div class="form-footer" style="grid-column:span 2">
+        <button type="button" class="btn ghost" onclick="closeOverlay('timelineOverlay')">Cancel</button>
+        <button type="submit" class="btn primary">Save Entry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Certificate Form -->
+<div class="overlay" id="certOverlay">
+  <div class="overlay-panel" style="max-width:28rem">
+    <div class="overlay-header">
+      <h2 class="overlay-title" id="certOverlayTitle">Add Certificate</h2>
+      <button class="overlay-close" onclick="closeOverlay('certOverlay')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg></button>
+    </div>
+    <form id="certForm" class="form-grid">
+      <input type="hidden" name="_id">
+      <div class="form-group">
+        <label class="form-label">Certificate Name</label>
+        <input class="form-input" type="text" name="name" required placeholder="Machine Learning Specialization">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Issuer</label>
+        <input class="form-input" type="text" name="issuer" required placeholder="Coursera · DeepLearning.AI">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input class="form-input" type="text" name="year" placeholder="2024">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sort Order</label>
+        <input class="form-input" type="number" name="sort_order" placeholder="1">
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn ghost" onclick="closeOverlay('certOverlay')">Cancel</button>
+        <button type="submit" class="btn primary">Save Certificate</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Message Detail -->
+<div class="overlay" id="msgOverlay">
+  <div class="overlay-panel" style="max-width:32rem">
+    <div class="overlay-header">
+      <h2 class="overlay-title">Message</h2>
+      <button class="overlay-close" onclick="closeOverlay('msgOverlay')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg></button>
+    </div>
+    <div id="msgDetail"></div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ===== STATE =====
+let authToken = localStorage.getItem('admin_token') || '';
+let state = { projects:[], skills:[], timeline:[], certificates:[], messages:[], stats:null, settings:{} };
+
+// ===== INIT =====
+async function init() {
+  const storedToken = localStorage.getItem('admin_token');
+  if (storedToken) {
+    authToken = storedToken;
+    const ok = await verifyToken();
+    if (ok) { showDashboard(); loadAll(); return; }
+  }
+  showLogin();
+}
+
+async function verifyToken() {
+  try {
+    const res = await apiFetch('/api/me');
+    return res.ok;
+  } catch { return false; }
+}
+
+function showLogin() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('dashboardPage').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('dashboardPage').style.display = 'grid';
+}
+
+// ===== AUTH =====
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = document.getElementById('loginPassword').value;
+  const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ password }) });
+  if (res.ok) {
+    const data = await res.json();
+    authToken = data.token || 'session';
+    localStorage.setItem('admin_token', authToken);
+    document.getElementById('loginError').style.display = 'none';
+    showDashboard(); loadAll();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+});
+
+function handleLogout() {
+  fetch('/api/logout', { method:'POST', headers:{ 'Authorization': 'Bearer '+authToken } });
+  authToken = ''; localStorage.removeItem('admin_token');
+  showLogin();
+}
+
+// ===== API =====
+function apiFetch(url, opts={}) {
+  return fetch(url, { ...opts, headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+authToken, ...(opts.headers||{}) } });
+}
+
+// ===== LOAD =====
+async function loadAll() {
+  await Promise.all([loadStats(), loadMessages(), loadProjects(), loadSkills(), loadTimeline(), loadCerts(), loadSettings()]);
+}
+
+async function loadStats() {
+  try {
+    const res = await apiFetch('/api/admin/stats');
+    if (!res.ok) return;
+    state.stats = await res.json();
+    renderOverview();
+  } catch {}
+}
+
+async function loadMessages() {
+  try {
+    const res = await apiFetch('/api/admin/messages');
+    if (!res.ok) return;
+    state.messages = await res.json();
+    renderMessages();
+    const unread = state.messages.filter(m => !m.read).length;
+    const badge = document.getElementById('unreadBadge');
+    if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline'; }
+  } catch {}
+}
+
+async function loadProjects() {
+  try {
+    const res = await apiFetch('/api/admin/projects');
+    if (!res.ok) return;
+    state.projects = await res.json();
+    renderProjectsTable();
+  } catch {}
+}
+
+async function loadSkills() {
+  try {
+    const res = await apiFetch('/api/admin/skills');
+    if (!res.ok) return;
+    state.skills = await res.json();
+    renderSkillsTable();
+  } catch {}
+}
+
+async function loadTimeline() {
+  try {
+    const res = await apiFetch('/api/admin/timeline');
+    if (!res.ok) return;
+    state.timeline = await res.json();
+    renderTimelineTable();
+  } catch {}
+}
+
+async function loadCerts() {
+  try {
+    const res = await apiFetch('/api/admin/certificates');
+    if (!res.ok) return;
+    state.certificates = await res.json();
+    renderCertsTable();
+  } catch {}
+}
+
+async function loadSettings() {
+  try {
+    const res = await apiFetch('/api/admin/settings');
+    if (!res.ok) return;
+    state.settings = await res.json();
+    populateSettingsForm();
+  } catch {}
+}
+
+// ===== TABS =====
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== OVERVIEW =====
+function renderOverview() {
+  const s = state.stats;
+  if (!s) return;
+  const totalViews = s.viewsByDay ? s.viewsByDay.reduce((a,b) => a+b.views, 0) : 0;
+  document.getElementById('overviewStats').innerHTML = `
+    <div class="stat-card"><div class="stat-card-value">${totalViews}</div><div class="stat-card-label">Total Views</div></div>
+    <div class="stat-card"><div class="stat-card-value">${state.projects.length}</div><div class="stat-card-label">Projects</div></div>
+    <div class="stat-card"><div class="stat-card-value">${state.messages.filter(m=>!m.read).length}</div><div class="stat-card-label">Unread Messages</div></div>
+    <div class="stat-card"><div class="stat-card-value">${state.certificates.length}</div><div class="stat-card-label">Certificates</div></div>
+  `;
+  if (s.viewsByDay && s.viewsByDay.length) {
+    const max = Math.max(...s.viewsByDay.map(d=>d.views));
+    document.getElementById('viewsChart').innerHTML = s.viewsByDay.map(d =>
+      `<div class="chart-bar" style="height:${Math.round((d.views/max)*100)}%" title="${d.date}: ${d.views} views"></div>`
+    ).join('');
+  }
+}
+
+// ===== MESSAGES =====
+function renderMessages() {
+  const el = document.getElementById('messagesList');
+  if (!state.messages.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><p>No messages yet.</p></div>'; return; }
+  el.innerHTML = state.messages.slice().reverse().map(m => `
+    <div class="msg-item ${m.read?'':'unread'}" onclick="viewMessage('${m.id}')">
+      <div class="msg-avatar">${(m.name||'?')[0].toUpperCase()}</div>
+      <div class="msg-body">
+        <div class="msg-name">${escHtml(m.name||'Unknown')} ${m.read?'':'<span class="msg-unread-dot"></span>'}</div>
+        <div class="msg-email">${escHtml(m.email||'')}</div>
+        <div class="msg-preview">${escHtml(m.body||'')}</div>
+      </div>
+      <div class="msg-date">${formatDate(m.date)}</div>
+    </div>`).join('');
+}
+
+async function viewMessage(id) {
+  const m = state.messages.find(x=>x.id===id); if (!m) return;
+  document.getElementById('msgDetail').innerHTML = `
+    <p style="font-size:.75rem;color:rgba(17,17,17,.45);margin-bottom:1rem">${formatDate(m.date)}</p>
+    <p><strong>${escHtml(m.name)}</strong> &lt;${escHtml(m.email)}&gt;</p>
+    <p style="margin-top:1rem;font-size:.9375rem;line-height:1.7;white-space:pre-wrap">${escHtml(m.body)}</p>
+    <div style="margin-top:1.5rem;display:flex;gap:.75rem">
+      <a class="btn primary" href="mailto:${escHtml(m.email)}">Reply via email</a>
+      <button class="btn danger" onclick="deleteMessage('${m.id}')">Delete</button>
+    </div>`;
+  openOverlay('msgOverlay');
+  if (!m.read) {
+    await apiFetch('/api/admin/messages/'+id+'/read', {method:'PUT'});
+    m.read = true; renderMessages();
+    const unread = state.messages.filter(x=>!x.read).length;
+    const badge = document.getElementById('unreadBadge');
+    badge.textContent = unread; badge.style.display = unread>0?'inline':'none';
+  }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('Delete this message?')) return;
+  await apiFetch('/api/admin/messages/'+id, {method:'DELETE'});
+  state.messages = state.messages.filter(m=>m.id!==id);
+  renderMessages(); closeOverlay('msgOverlay'); toast('Message deleted');
+}
+
+// ===== PROJECTS =====
+function renderProjectsTable() {
+  const tbody = document.getElementById('projectsTableBody');
+  if (!state.projects.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(17,17,17,.4)">No projects yet.</td></tr>'; return; }
+  tbody.innerHTML = state.projects.map(p => `
+    <tr>
+      <td style="font-weight:500">${escHtml(p.title)}</td>
+      <td><span class="badge gray">${escHtml(p.category||'—')}</span></td>
+      <td>${p.year||'—'}</td>
+      <td><span class="badge ${p.published?'green':'amber'}">${p.published?'Published':'Draft'}</span></td>
+      <td><div style="display:flex;gap:.5rem">
+        <button class="btn ghost sm" onclick="editProject('${p.id}')">Edit</button>
+        <button class="btn danger sm" onclick="deleteProject('${p.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function openProjectForm(id) {
+  const form = document.getElementById('projectForm');
+  form.reset(); form.elements._id.value = '';
+  document.getElementById('projectOverlayTitle').textContent = id ? 'Edit Project' : 'Add Project';
+  if (id) {
+    const p = state.projects.find(x=>x.id===id);
+    if (!p) return;
+    Object.keys(form.elements).forEach(k => { const el=form.elements[k]; if(el && p[k]!==undefined) el.value=p[k]; });
+    form.elements._id.value = p.id;
+    form.elements.tech_str.value = (p.tech||[]).join(', ');
+    form.elements.published.checked = !!p.published;
+  }
+  openOverlay('projectOverlay');
+}
+
+function editProject(id) { openProjectForm(id); }
+
+document.getElementById('projectForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.elements._id.value;
+  const data = {
+    title: form.elements.title.value,
+    category: form.elements.category.value,
+    year: parseInt(form.elements.year.value)||new Date().getFullYear(),
+    tagline: form.elements.tagline.value,
+    description: form.elements.description.value,
+    tech: form.elements.tech_str.value.split(',').map(s=>s.trim()).filter(Boolean),
+    image: form.elements.image.value,
+    repo: form.elements.repo.value,
+    link: form.elements.link.value,
+    sort_order: parseInt(form.elements.sort_order.value)||99,
+    published: form.elements.published.checked,
+    draft: !form.elements.published.checked,
+  };
+  const res = id
+    ? await apiFetch('/api/admin/projects/'+id, {method:'PUT', body:JSON.stringify(data)})
+    : await apiFetch('/api/admin/projects', {method:'POST', body:JSON.stringify(data)});
+  if (res.ok) { toast(id?'Project updated':'Project added'); closeOverlay('projectOverlay'); loadProjects(); }
+  else toast('Save failed','error');
+});
+
+async function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  const res = await apiFetch('/api/admin/projects/'+id, {method:'DELETE'});
+  if (res.ok) { toast('Project deleted'); loadProjects(); } else toast('Delete failed','error');
+}
+
+// ===== SKILLS =====
+function renderSkillsTable() {
+  const tbody = document.getElementById('skillsTableBody');
+  if (!state.skills.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:rgba(17,17,17,.4)">No skills yet.</td></tr>'; return; }
+  const sorted = [...state.skills].sort((a,b)=>(a.sort_order||99)-(b.sort_order||99));
+  tbody.innerHTML = sorted.map(s => `
+    <tr>
+      <td style="font-weight:500">${escHtml(s.name)}</td>
+      <td><span class="badge blue">${escHtml(s.grp||'—')}</span></td>
+      <td>${s.sort_order||'—'}</td>
+      <td><div style="display:flex;gap:.5rem">
+        <button class="btn ghost sm" onclick="editSkill('${s.id}')">Edit</button>
+        <button class="btn danger sm" onclick="deleteSkill('${s.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function openSkillForm(id) {
+  const form = document.getElementById('skillForm');
+  form.reset(); form.elements._id.value = '';
+  document.getElementById('skillOverlayTitle').textContent = id ? 'Edit Skill' : 'Add Skill';
+  if (id) {
+    const s = state.skills.find(x=>x.id===id);
+    if (!s) return;
+    form.elements.name.value = s.name||'';
+    form.elements.grp.value = s.grp||'';
+    form.elements.sort_order.value = s.sort_order||'';
+    form.elements._id.value = s.id;
+  }
+  openOverlay('skillOverlay');
+}
+
+function editSkill(id) { openSkillForm(id); }
+
+document.getElementById('skillForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.elements._id.value;
+  const data = { name: form.elements.name.value, grp: form.elements.grp.value, sort_order: parseInt(form.elements.sort_order.value)||99 };
+  const res = id
+    ? await apiFetch('/api/admin/skills/'+id, {method:'PUT', body:JSON.stringify(data)})
+    : await apiFetch('/api/admin/skills', {method:'POST', body:JSON.stringify(data)});
+  if (res.ok) { toast(id?'Skill updated':'Skill added'); closeOverlay('skillOverlay'); loadSkills(); }
+  else toast('Save failed','error');
+});
+
+async function deleteSkill(id) {
+  if (!confirm('Delete this skill?')) return;
+  const res = await apiFetch('/api/admin/skills/'+id, {method:'DELETE'});
+  if (res.ok) { toast('Skill deleted'); loadSkills(); } else toast('Delete failed','error');
+}
+
+// ===== TIMELINE =====
+function renderTimelineTable() {
+  const tbody = document.getElementById('timelineTableBody');
+  if (!state.timeline.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(17,17,17,.4)">No entries yet.</td></tr>'; return; }
+  const sorted = [...state.timeline].sort((a,b)=>(a.sort_order||99)-(b.sort_order||99));
+  tbody.innerHTML = sorted.map(t => `
+    <tr>
+      <td style="font-weight:500">${escHtml(t.role)}</td>
+      <td>${escHtml(t.org)}</td>
+      <td><span class="badge ${t.kind==='work'?'amber':'blue'}">${t.kind==='work'?'Work':'Education'}</span></td>
+      <td style="color:rgba(17,17,17,.55)">${escHtml(t.period)}</td>
+      <td><div style="display:flex;gap:.5rem">
+        <button class="btn ghost sm" onclick="editTimeline('${t.id}')">Edit</button>
+        <button class="btn danger sm" onclick="deleteTimeline('${t.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function openTimelineForm(id) {
+  const form = document.getElementById('timelineForm');
+  form.reset(); form.elements._id.value = '';
+  document.getElementById('timelineOverlayTitle').textContent = id ? 'Edit Entry' : 'Add Entry';
+  if (id) {
+    const t = state.timeline.find(x=>x.id===id);
+    if (!t) return;
+    ['role','org','place','period','kind','details','sort_order'].forEach(k => { if(form.elements[k]) form.elements[k].value=t[k]||''; });
+    form.elements._id.value = t.id;
+  }
+  openOverlay('timelineOverlay');
+}
+
+function editTimeline(id) { openTimelineForm(id); }
+
+document.getElementById('timelineForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.elements._id.value;
+  const data = { role:form.elements.role.value, org:form.elements.org.value, place:form.elements.place.value, period:form.elements.period.value, kind:form.elements.kind.value, details:form.elements.details.value, sort_order:parseInt(form.elements.sort_order.value)||99 };
+  const res = id
+    ? await apiFetch('/api/admin/timeline/'+id, {method:'PUT', body:JSON.stringify(data)})
+    : await apiFetch('/api/admin/timeline', {method:'POST', body:JSON.stringify(data)});
+  if (res.ok) { toast(id?'Entry updated':'Entry added'); closeOverlay('timelineOverlay'); loadTimeline(); }
+  else toast('Save failed','error');
+});
+
+async function deleteTimeline(id) {
+  if (!confirm('Delete this entry?')) return;
+  const res = await apiFetch('/api/admin/timeline/'+id, {method:'DELETE'});
+  if (res.ok) { toast('Entry deleted'); loadTimeline(); } else toast('Delete failed','error');
+}
+
+// ===== CERTIFICATES =====
+function renderCertsTable() {
+  const tbody = document.getElementById('certsTableBody');
+  if (!state.certificates.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:rgba(17,17,17,.4)">No certificates yet.</td></tr>'; return; }
+  const sorted = [...state.certificates].sort((a,b)=>(a.sort_order||99)-(b.sort_order||99));
+  tbody.innerHTML = sorted.map(c => `
+    <tr>
+      <td style="font-weight:500">${escHtml(c.name)}</td>
+      <td style="color:rgba(17,17,17,.6)">${escHtml(c.issuer)}</td>
+      <td><span class="badge gray">${escHtml(c.year)}</span></td>
+      <td><div style="display:flex;gap:.5rem">
+        <button class="btn ghost sm" onclick="editCert('${c.id}')">Edit</button>
+        <button class="btn danger sm" onclick="deleteCert('${c.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function openCertForm(id) {
+  const form = document.getElementById('certForm');
+  form.reset(); form.elements._id.value = '';
+  document.getElementById('certOverlayTitle').textContent = id ? 'Edit Certificate' : 'Add Certificate';
+  if (id) {
+    const c = state.certificates.find(x=>x.id===id);
+    if (!c) return;
+    ['name','issuer','year','sort_order'].forEach(k => { if(form.elements[k]) form.elements[k].value=c[k]||''; });
+    form.elements._id.value = c.id;
+  }
+  openOverlay('certOverlay');
+}
+
+function editCert(id) { openCertForm(id); }
+
+document.getElementById('certForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const id = form.elements._id.value;
+  const data = { name:form.elements.name.value, issuer:form.elements.issuer.value, year:form.elements.year.value, sort_order:parseInt(form.elements.sort_order.value)||99 };
+  const res = id
+    ? await apiFetch('/api/admin/certificates/'+id, {method:'PUT', body:JSON.stringify(data)})
+    : await apiFetch('/api/admin/certificates', {method:'POST', body:JSON.stringify(data)});
+  if (res.ok) { toast(id?'Certificate updated':'Certificate added'); closeOverlay('certOverlay'); loadCerts(); }
+  else toast('Save failed','error');
+});
+
+async function deleteCert(id) {
+  if (!confirm('Delete this certificate?')) return;
+  const res = await apiFetch('/api/admin/certificates/'+id, {method:'DELETE'});
+  if (res.ok) { toast('Certificate deleted'); loadCerts(); } else toast('Delete failed','error');
+}
+
+// ===== SETTINGS =====
+function populateSettingsForm() {
+  const form = document.getElementById('settingsForm');
+  const s = state.settings;
+  ['name','title','location','email','phone','github','linkedin','bio','about','headline'].forEach(k => {
+    if (form.elements[k]) form.elements[k].value = s[k]||'';
+  });
+}
+
+document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {};
+  ['name','title','location','email','phone','github','linkedin','bio','about','headline'].forEach(k => { data[k] = form.elements[k].value; });
+  const res = await apiFetch('/api/admin/settings', {method:'PUT', body:JSON.stringify(data)});
+  if (res.ok) toast('Settings saved'); else toast('Save failed','error');
+});
+
+document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = e.target.elements.password.value;
+  const res = await apiFetch('/api/admin/password', {method:'PUT', body:JSON.stringify({password})});
+  if (res.ok) { toast('Password updated'); e.target.reset(); } else toast('Update failed','error');
+});
+
+// ===== UTILS =====
+function openOverlay(id) { document.getElementById(id).classList.add('open'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); }));
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open')); });
+
+function toast(msg, type='success') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); } catch { return d; }
+}
+
+init();
+</script>
+</body>
+</html>

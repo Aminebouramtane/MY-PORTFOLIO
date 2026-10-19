@@ -428,10 +428,6 @@
   "stats": {
     "viewsByDay": [
       {
-        "date": "2026-09-05",
-        "views": 26
-      },
-      {
         "date": "2026-09-06",
         "views": 35
       },
@@ -546,6 +542,10 @@
       {
         "date": "2026-10-05",
         "views": 32
+      },
+      {
+        "date": "2026-10-19",
+        "views": 10
       }
     ],
     "topProjects": [
@@ -573,5 +573,49 @@
   },
   "admin": {
     "passwordHash": "admin123"
-  }
+  },
+  "certificates": [
+    {
+      "id": "cert1",
+      "name": "Machine Learning Specialization",
+      "issuer": "Coursera · Stanford / DeepLearning.AI",
+      "year": "2024",
+      "sort_order": 1
+    },
+    {
+      "id": "cert2",
+      "name": "Deep Learning Specialization",
+      "issuer": "Coursera · DeepLearning.AI",
+      "year": "2024",
+      "sort_order": 2
+    },
+    {
+      "id": "cert3",
+      "name": "Power BI Data Analyst Associate",
+      "issuer": "Microsoft",
+      "year": "2025",
+      "sort_order": 3
+    },
+    {
+      "id": "cert4",
+      "name": "Python for Data Science & AI",
+      "issuer": "IBM / Coursera",
+      "year": "2023",
+      "sort_order": 4
+    },
+    {
+      "id": "cert5",
+      "name": "Computer Vision with PyTorch",
+      "issuer": "Udemy",
+      "year": "2025",
+      "sort_order": 5
+    },
+    {
+      "id": "cert6",
+      "name": "SQL for Data Analysis",
+      "issuer": "Mode Analytics",
+      "year": "2023",
+      "sort_order": 6
+    }
+  ]
 }
